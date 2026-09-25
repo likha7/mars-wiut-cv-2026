@@ -42,6 +42,7 @@ WALK_MIN_SEC = 1.5
 WALK_MIN_HITS = 2
 STATIC_PERSON_IOU = 0.5    # a "person" box that keeps this IoU with where it first stood ...
 STATIC_PERSON_SEC = 15.0   # ... for this long is not crossing: a pole, a road worker, someone waiting
+STATIC_PERSON_GAP = 10.0   # s; such false "persons" flicker (at night), so allow long gaps between hits
 
 # video file name -> wall seconds spent in detect_events. Part B reads it to plan its own
 # frame stride (timing only, never Part A's results).
@@ -216,7 +217,7 @@ def static_people(samples: list[Sample]) -> list[np.ndarray]:
     ids: list[np.ndarray] = []     # per sample: anchor index of each person box
     for s in samples:
         people = s.boxes[s.names == "person"]
-        live = [k for k, a in enumerate(anchors) if s.t - a[2] <= STOP_MAX_GAP]
+        live = [k for k, a in enumerate(anchors) if s.t - a[2] <= STATIC_PERSON_GAP]
         iou = iou_matrix(np.array([anchors[k][0] for k in live]).reshape(-1, 4), people)
         cid = np.full(len(people), -1)
         used = set()
