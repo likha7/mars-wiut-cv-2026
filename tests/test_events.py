@@ -82,3 +82,9 @@ def test_person_at_bus_stop_is_not_jaywalking():
     assert on_carriageway(np.array([BUS_STOP]))[0]
     s = samples(lambda t: [("person", box_at(BUS_STOP[0] + 0.003 * t, BUS_STOP[1], w=0.01, h=0.03))], t_end=6)
     assert jaywalking_segments(s) == []
+
+
+def test_flickering_static_person_is_not_jaywalking():
+    # seen for 3 s, missed for 4 s, again and again at the same spot (a night-time false detection)
+    s = samples(lambda t: [("person", box_at(*MID_ROAD, w=0.01, h=0.03))] if t % 7 < 3 else [], t_end=40)
+    assert jaywalking_segments(s) == []
