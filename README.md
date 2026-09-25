@@ -7,8 +7,8 @@ We watch a fixed CCTV camera at a signalised intersection in Tashkent and do two
 
 | member | role |
 |---|---|
-| Yakshinboyev Asilbek | Part A — event detection |
-| Dagarova Solikha | Part B — accident anticipation; integration, packaging |
+| Dagarova Solikha | Part A (event detection) and Part B (accident anticipation): models, rules, experiments; integration and packaging |
+| Yakshinboyev Asilbek | team member |
 | Torexanov Sanjar | Website (demo, EDA, results pages) |
 
 ## Install and run
@@ -29,7 +29,7 @@ Check the output format and run the tests:
 
 ```bash
 python evaluate.py --pred predictions_samples.json --validate-only
-python -m pytest tests        # 23 tests on synthetic boxes and tracks, no video needed
+python -m pytest tests        # 24 tests on synthetic boxes and tracks, no video needed
 ```
 
 ## Layout
@@ -85,7 +85,7 @@ The task allows hard-coding facts about the scene. We drew polygons once on a sa
   * Overlapping segments are merged into one, as the FAQ asks.
 * **jaywalking** ("a pedestrian on the carriageway outside a crossing"):
   * At each sample we ask: is any person's foot point on the carriageway, outside every zebra crossing and outside the bus-stop kerb, not on a two-wheeler (a rider) and not inside a vehicle box?
-  * A "person" box that stays in one place for 15 s or more is ignored. It is a pole, a road worker or someone waiting, not someone crossing.
+  * A "person" box that stays in one place for 15 s or more is ignored, even if it is missed for up to 10 s at a time. It is a pole, a road worker or someone waiting, not someone crossing, and such false detections flicker at night.
   * Runs of "yes" become segments. Gaps ≤ 1.5 s are merged, and a segment needs ≥ 1.5 s and ≥ 2 samples.
   * Both filters came from checking the event pictures on sample video C3905. Before them, people waiting at the bus stop produced an 80-s "jaywalking" segment.
 * The other 12 classes are not predicted. The metric scores a predicted class that never occurs as 0, so we only report classes our rules handle reliably.
