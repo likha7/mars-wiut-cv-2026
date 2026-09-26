@@ -139,13 +139,25 @@ E ranks pre-crash frames better than chance (AP 0.10) and gives zero false alarm
 
 ### Part A (sample videos)
 
-We have no labels for the sample videos, so we can't give an F1. Instead we checked every detected event by eye on its contact sheet (`tools/render_scene.py --pred`). Counts per video: _filled in from `predictions_samples.json`_.
+We have no labels for the sample videos, so we can't give an F1. Instead we checked every detected event by eye on its contact sheet (`tools/render_scene.py --pred`). Counts per video (from `predictions_samples.json`):
+
+| video | stopped_vehicle | jaywalking |
+|---|---|---|
+| C3896.MP4 (340 s, day) | 2 | 18 |
+| C3897.MP4 (318 s, day) | 3 | 17 |
+| C3905.MP4 (128 s, dusk/night) | 1 | 11 |
+
+Honest reading of the pictures:
+* The stopped_vehicle segments are vehicles that stand still for minutes. We don't know whether the annotators count long kerb-side waits as events.
+* Many jaywalking segments are people crossing just outside the painted zebra, or stepping off the kerb near it. Some are false detections at night. Precision is unknown without labels.
 
 ### Runtime (official harness, Kaggle T4, 4 CPU cores; budget 3× duration for A + B)
 
 | video | duration | Part A | Part B | total | × duration |
 |---|---|---|---|---|---|
-| C3905.MP4 (4K, 29.97 fps) | 127.6 s | 71.5 s | 190.3 s | 261.8 s | **2.05×** (budget 3×, 382.9 s) |
+| C3896.MP4 (4K, 29.97 fps) | 340.3 s | 220.4 s | 534.0 s | 754.4 s | **2.22×** |
+| C3897.MP4 | 317.8 s | 200.9 s | 495.8 s | 696.6 s | **2.19×** |
+| C3905.MP4 | 127.6 s | 67.5 s | 193.0 s | 260.4 s | **2.04×** |
 
 Measured with the official `run_submission.py` in a fresh virtualenv after `pip install -r requirements.txt`. Two consecutive runs gave identical events and risk curves (max difference 0.0000).
 
@@ -175,7 +187,7 @@ All experiments ran on Kaggle (GPU T4).
 * `tools/cache_tracks.py` runs the detector and tracker once per video. `tools/replay.py` then scores Part B variants with the official metric in seconds.
 * `tools/train_calibrator.py` trains the logistic calibrator.
 * `tools/build_flow_prior.py` builds the lane-direction map.
-* `tools/render_scene.py` and `tools/render_video.py` make the website pictures and annotated videos.
+* `tools/render_scene.py`, `tools/render_video.py` and `tools/export_examples.py` make the website pictures (one per event moment, plus a timeline per video) and the annotated videos.
 
 ## Limits and next steps
 
