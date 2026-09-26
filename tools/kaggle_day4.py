@@ -189,10 +189,28 @@ def videos_step() -> None:
         log(f"VIDEO {out.strip()} ({time.perf_counter() - t0:.0f}s)")
 
 
+def examples() -> None:
+    """Website pictures: 3 annotated frames per event + a timeline per video, zipped for download."""
+    import shutil
+
+    pred = PRED if PRED.exists() else next(iter(sorted(KAGGLE_INPUT.rglob("predictions_samples.json"))), None)
+    if pred is None:
+        raise SystemExit("no predictions_samples.json: run the harness step, or attach the last run's output")
+    out = W / "examples"
+    predicted = json.loads(Path(pred).read_text())["videos"]
+    for v in videos():
+        if v.name in predicted:
+            log("EXAMPLES " + run([sys.executable, REPO / "tools/export_examples.py", "--video", v,
+                                   "--pred", pred, "--out", out]).strip())
+    if pred != PRED:
+        shutil.copy(pred, PRED)
+    log(f"EXAMPLES zipped: {shutil.make_archive(str(W / 'examples'), 'zip', out)}")
+
+
 def main() -> int:
     step = sys.argv[1] if len(sys.argv) > 1 else "all"
     steps = {"setup": setup, "probe": probe, "harness": harness, "validate": validate,
-             "sheets": sheets, "videos": videos_step}
+             "sheets": sheets, "videos": videos_step, "examples": examples}
     for name in (list(steps) if step == "all" else [step]):
         t0 = time.perf_counter()
         steps[name]()

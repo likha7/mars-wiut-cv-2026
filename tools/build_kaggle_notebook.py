@@ -71,6 +71,18 @@ def main() -> int:
         cells.append(("code", "# summary + pictures\nprint(open('/kaggle/working/day4_summary.txt').read())\n"
                               "from IPython.display import Image, display\nimport glob\n"
                               "for f in sorted(glob.glob('/kaggle/working/plots/*_C*.jpg')): print(f); display(Image(f, width=1100))"))
+    elif args.day == 5:
+        cells = [("markdown", "# WIUT Hackathon — team mars · website pictures\n"
+                              "Attach the output of the Day 4 run (**Add Input → Your Work → notebook857991aef6**): "
+                              "it has the videos and `predictions_samples.json`. Then *Save & Run All*. "
+                              "Download `examples.zip` from the Output tab."),
+                 unpack, install,
+                 ("code", "# 3) sample videos from the attached output\n"
+                          "!python tools/kaggle_day4.py setup 2>&1 | grep -v '^\\$' | tail -5"),
+                 ("code", "# 4) 3 pictures per event + timeline per video -> examples.zip\n"
+                          "!python tools/kaggle_day4.py examples 2>&1 | grep -v '^\\$' | tail -20"),
+                 ("code", "from IPython.display import Image, display\nimport glob\n"
+                          "for f in sorted(glob.glob('/kaggle/working/examples/*/timeline.png')): print(f); display(Image(f))")]
     elif args.day == 3:
         steps = [("setup", "sample videos + 240-clip ACCIDENT dev set"),
                  ("nvdec", "GPU hardware-decode benchmark (for Part A)"),
